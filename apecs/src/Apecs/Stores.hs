@@ -33,7 +33,7 @@ import           GHC.TypeLits
 import           Apecs.Core
 
 -- | A map based on 'Data.IntMap.Strict'. O(log(n)) for most operations.
-newtype Map c = Map (IORef (M.IntMap c))
+newtype Map c = Map (IORef (M.IntMap c)) deriving (Eq)
 
 type instance Elem (Map c) = c
 instance MonadIO m => ExplInit m (Map c) where
@@ -69,7 +69,7 @@ instance MonadIO m => ExplMembers m (Map c) where
 -- | A Unique contains zero or one component.
 --   Writing to it overwrites both the previous component and its owner.
 --   Its main purpose is to be a 'Map' optimized for when only ever one component inhabits it.
-newtype Unique c = Unique (IORef (Maybe (Int, c)))
+newtype Unique c = Unique (IORef (Maybe (Int, c))) deriving (Eq)
 type instance Elem (Unique c) = c
 instance MonadIO m => ExplInit m (Unique c) where
   explInit = liftIO$ Unique <$> newIORef Nothing
@@ -109,7 +109,7 @@ instance MonadIO m => ExplMembers m (Unique c) where
 --   The convenience entity 'global' is defined as -1, and can be used to make operations on a global more explicit, i.e. 'Time t <- get global'.
 --
 --   You also can read and write Globals during a 'cmap' over other components.
-newtype Global c = Global (IORef c)
+newtype Global c = Global (IORef c) deriving (Eq)
 type instance Elem (Global c) = c
 instance (Monoid c, MonadIO m) => ExplInit m (Global c) where
   {-# INLINE explInit #-}
@@ -210,7 +210,7 @@ instance (MonadIO m, ExplMembers m s) => ExplMembers m (Cache n s) where
 -- | Wrapper that makes a store read-only by hiding its 'ExplSet' and 'ExplDestroy' instances.
 --   This is primarily used to protect the 'EntityCounter' from accidental overwrites.
 --   Use 'setReadOnly' and 'destroyReadOnly' to override.
-newtype ReadOnly s = ReadOnly s
+newtype ReadOnly s = ReadOnly s deriving (Eq)
 type instance Elem (ReadOnly s) = Elem s
 
 instance (Functor m, ExplInit m s) => ExplInit m (ReadOnly s) where
